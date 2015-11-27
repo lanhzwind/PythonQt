@@ -224,6 +224,7 @@ set(headers
 if(PythonQt_QT_VERSION MATCHES 5)
   set(sources ${sources} extensions/PythonQt_QtAll/PythonQt_QtAll.cpp)
   set(headers ${headers} extensions/PythonQt_QtAll/PythonQt_QtAll.h)
+  set(PythonQt_INCLUDE_DIRS ${PythonQt_SOURCE_DIR}/src ${PythonQt_SOURCE_DIR}/extensions/PythonQt_QtAll)
 else()
   set(sources ${sources} generated_cpp${generated_cpp_suffix}/PythonQt_QtBindings.cpp)
   set(headers ${headers} generated_cpp${generated_cpp_suffix}/PythonQt_QtBindings.h)
@@ -388,3 +389,5 @@ if(BUILD_TESTING)
     )
 endif()
 
+
+include(CMake/GeneratePythonQtConfig.cmake)
