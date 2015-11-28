@@ -219,6 +219,7 @@ set(headers
     src/PythonQtVariants.h
     src/PythonQtPythonInclude.h
     src/PythonQtUtils.h
+    src/gui/PythonQtScriptingConsole.h
 )
 
 if(PythonQt_QT_VERSION MATCHES 5)
