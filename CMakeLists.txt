@@ -225,7 +225,7 @@ set(headers
 if(PythonQt_QT_VERSION MATCHES 5)
   set(sources ${sources} extensions/PythonQt_QtAll/PythonQt_QtAll.cpp)
   set(headers ${headers} extensions/PythonQt_QtAll/PythonQt_QtAll.h)
-  set(PythonQt_INCLUDE_DIRS ${PythonQt_SOURCE_DIR}/src ${PythonQt_SOURCE_DIR}/extensions/PythonQt_QtAll)
+  set(PythonQt_INCLUDE_DIRS ${PythonQt_SOURCE_DIR}/src ${PythonQt_SOURCE_DIR}/src/gui ${PythonQt_SOURCE_DIR}/extensions/PythonQt_QtAll)
 else()
   set(sources ${sources} generated_cpp${generated_cpp_suffix}/PythonQt_QtBindings.cpp)
   set(headers ${headers} generated_cpp${generated_cpp_suffix}/PythonQt_QtBindings.h)
@@ -336,8 +336,10 @@ set_target_properties(PythonQt PROPERTIES DEFINE_SYMBOL PYTHONQT_EXPORTS)
 # That should solve linkage error on Mac when the project is used in a superbuild setup
 # See http://blog.onesadcookie.com/2008/01/installname-magic.html
 #
+set(PythonQt_LIB_DIR ${PythonQt_BINARY_DIR}/lib)
 set_target_properties(PythonQt  PROPERTIES
   INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+  LIBRARY_OUTPUT_DIRECTORY "${PythonQt_LIB_DIR}"
   )
 
 target_link_libraries(PythonQt
@@ -356,6 +358,11 @@ install(FILES ${headers} DESTINATION ${PythonQt_INSTALL_INCLUDE_DIR})
 
 #-----------------------------------------------------------------------------
 # Testing
+
+#----------------------------------------------------------------------------
+# Copy headers to include/PythonQt
+file(COPY ${headers} DESTINATION ${PythonQt_BINARY_DIR}/include/PythonQt)
+
 
 option(BUILD_TESTING "Build the testing tree." OFF)
 include(CTest)
