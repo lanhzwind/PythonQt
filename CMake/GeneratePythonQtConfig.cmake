@@ -7,7 +7,7 @@ configure_file(
 set(PythonQt_INCLUDE_DIRS_CONFIG ${PythonQt_INCLUDE_DIRS})
 
 # Library directories
-set(PythonQt_LIBRARY_DIRS_CONFIG ${PythonQt_BINARY_DIR})
+set(PythonQt_LIBRARY_DIRS_CONFIG ${PythonQt_LIB_DIR})
 
 # UsePythonQt file
 set(PythonQt_USE_FILE_CONFIG ${PythonQt_BINARY_DIR}/UsePythonQt.cmake)
