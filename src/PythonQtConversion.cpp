@@ -46,6 +46,7 @@
 #include <QTime>
 #include <QDate>
 #include <climits>
+#include <limits>
 
 PythonQtValueStorage<qint64, 128>  PythonQtConv::global_valueStorage;
 PythonQtValueStorage<void*, 128>   PythonQtConv::global_ptrStorage;
@@ -383,7 +384,9 @@ void* PythonQtConv::ConvertPythonToQt(const PythonQtMethodInfo::ParameterInfo& i
      return ptr;
    }
 
-   if (PyObject_TypeCheck(obj, &PythonQtInstanceWrapper_Type) && info.typeId != PythonQtMethodInfo::Variant) {
+   if (PyObject_TypeCheck(obj, &PythonQtInstanceWrapper_Type) &&
+       info.typeId != PythonQtMethodInfo::Variant &&
+       !PythonQt::priv()->isPythonQtObjectPtrMetaId(info.typeId)) {
      // if we have a Qt wrapper object and if we do not need a QVariant, we do the following:
      // (the Variant case is handled below in a switch)
 
@@ -459,7 +462,6 @@ void* PythonQtConv::ConvertPythonToQt(const PythonQtMethodInfo::ParameterInfo& i
            bool ok;
            int value = PyObjGetInt(obj, true, ok);
            if (ok && value==0) {
-             // TODOXXX is this wise? or should it be expected from the programmer to use None?
              PythonQtValueStorage_ADD_VALUE_IF_NEEDED(alreadyAllocatedCPPObject,global_ptrStorage, void*, NULL, ptr);
            }
          }
@@ -984,7 +986,15 @@ QVariant PythonQtConv::PyObjToQVariant(PyObject* val, int type)
       type = QVariant::Int;
 #endif
     } else if (PyLong_Check(val)) {
-      type = QVariant::LongLong;
+      // return int if the value fits into that range,
+      // otherwise it would not be possible to get an int from Python 3
+      qint64 d = PyLong_AsLongLong(val);
+      if (d > std::numeric_limits<int>::max() ||
+          d < std::numeric_limits<int>::min()) {
+        type = QVariant::LongLong;
+      } else {
+        type = QVariant::Int;
+      }
     } else if (PyFloat_Check(val)) {
       type = QVariant::Double;
     } else if (PyObject_TypeCheck(val, &PythonQtInstanceWrapper_Type)) {
@@ -1448,6 +1458,56 @@ PyObject* PythonQtConv::createCopyFromMetaType( int type, const void* data )
 PyObject* PythonQtConv::convertFromStringRef(const void* inObject, int /*metaTypeId*/)
 {
   return PythonQtConv::QStringToPyObject(((QStringRef*)inObject)->toString());
+}
+
+QByteArray PythonQtConv::getCPPTypeName(PyObject* type)
+{
+  QByteArray result;
+  if (PyType_Check(type)) {
+    if (type->ob_type == &PythonQtClassWrapper_Type) {
+      PythonQtClassWrapper* wrapper = (PythonQtClassWrapper*)type;
+      // we have no good decision if this should be a pointer or a const reference
+      if (wrapper->classInfo()->isQObject()) {
+        // for QObjects, use a pointer
+        result = wrapper->classInfo()->className() + "*";
+      } else {
+        // everything else is a const reference (otherwise the user needs to use strings to specify the type)
+        result = wrapper->classInfo()->className();
+      }
+    } else {
+      PyTypeObject* typeObject = reinterpret_cast<PyTypeObject*>(type);
+      if (typeObject == &PyFloat_Type) {
+        result = "double";
+      } else if (typeObject == &PyBool_Type) {
+        result = "bool";
+#ifndef PY3K
+      } else if (typeObject == &PyInt_Type) {
+        result = "qint32";
+#endif
+      } else if (typeObject == &PyLong_Type) {
+        result = "qint64";
+      } else if (isStringType(typeObject)) {
+        result = "QString";
+      } else {
+        result = "PyObject*";
+      }
+    }
+  } else if (type == Py_None) {
+      result = "void";
+  } else {
+    bool dummy;
+    result = QMetaObject::normalizedType(PyObjGetString(type, true, dummy).toLatin1());
+  }
+  return result;
+}
+
+bool PythonQtConv::isStringType(PyTypeObject* type)
+{
+#ifdef PY3K
+  return type == &PyUnicode_Type
+#else
+  return type == &PyUnicode_Type || type == &PyString_Type;
+#endif
 }
 
 PyObject* PythonQtConv::convertFromQListOfPythonQtObjectPtr(const void* inObject, int /*metaTypeId*/)

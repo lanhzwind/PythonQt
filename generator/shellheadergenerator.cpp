@@ -127,7 +127,7 @@ void ShellHeaderGenerator::write(QTextStream &s, const AbstractMetaClass *meta_c
     | AbstractMetaClass::NotRemovedFromTargetLang);
 
   if (meta_class->qualifiedCppName().contains("Ssl")) {
-    s << "#ifndef QT_NO_OPENSSL"  << endl;
+    s << "#ifndef QT_NO_SSL"  << endl;
   }
 
   // Shell-------------------------------------------------------------------
@@ -165,6 +165,10 @@ void ShellHeaderGenerator::write(QTextStream &s, const AbstractMetaClass *meta_c
       s << ";" << endl;
     }
     s << endl;
+    if (meta_class->isQObject()) {
+      s << "  const QMetaObject* metaObject() const;" << endl;
+      s << "  int qt_metacall(QMetaObject::Call call, int id, void** args);" << endl;
+    }
     writeInjectedCode(s, meta_class, TypeSystem::PyShellDeclaration);
     writeInjectedCode(s, meta_class, TypeSystem::PyInheritShellDeclaration, true);
     s << "  PythonQtInstanceWrapper* _wrapper; " << endl;

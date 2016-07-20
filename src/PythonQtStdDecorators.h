@@ -53,6 +53,7 @@
 #include <QDateTime>
 #include <QDate>
 #include <QTime>
+#include <QTimer>
 #include <QImage>
 #include <QMetaMethod>
 #include <QMetaEnum>
@@ -63,15 +64,15 @@ class PYTHONQT_EXPORT PythonQtStdDecorators : public QObject
   Q_OBJECT
 
 public Q_SLOTS:
-  bool connect(QObject* sender, const QByteArray& signal, PyObject* callable);
-  bool connect(QObject* sender, const QByteArray& signal, QObject* receiver, const QByteArray& slot,  Qt::ConnectionType type = Qt::AutoConnection);
-  bool connect(QObject* receiver, QObject* sender, const QByteArray& signal, const QByteArray& slot,  Qt::ConnectionType type = Qt::AutoConnection) { return connect(sender, signal, receiver, slot, type); }
-  bool static_QObject_connect(QObject* sender, const QByteArray& signal, PyObject* callable) { return connect(sender, signal, callable); }
-  bool static_QObject_connect(QObject* sender, const QByteArray& signal, QObject* receiver, const QByteArray& slot,  Qt::ConnectionType type = Qt::AutoConnection)  { return connect(sender, signal, receiver, slot, type); }
-  bool disconnect(QObject* sender, const QByteArray& signal, PyObject* callable = NULL);
-  bool disconnect(QObject* sender, const QByteArray& signal, QObject* receiver, const QByteArray& slot);
-  bool static_QObject_disconnect(QObject* sender, const QByteArray& signal, PyObject* callable = NULL) { return disconnect(sender, signal, callable); }
-  bool static_QObject_disconnect(QObject* sender, const QByteArray& signal, QObject* receiver, const QByteArray& slot) { return connect(sender, signal, receiver, slot); }
+  bool connect(QObject* sender, const QString& signal, PyObject* callable);
+  bool connect(QObject* sender, const QString& signal, QObject* receiver, const QString& slot,  Qt::ConnectionType type = Qt::AutoConnection);
+  bool connect(QObject* receiver, QObject* sender, const QString& signal, const QString& slot,  Qt::ConnectionType type = Qt::AutoConnection) { return connect(sender, signal, receiver, slot, type); }
+  bool static_QObject_connect(QObject* sender, const QString& signal, PyObject* callable) { return connect(sender, signal, callable); }
+  bool static_QObject_connect(QObject* sender, const QString& signal, QObject* receiver, const QString& slot,  Qt::ConnectionType type = Qt::AutoConnection)  { return connect(sender, signal, receiver, slot, type); }
+  bool disconnect(QObject* sender, const QString& signal, PyObject* callable = NULL);
+  bool disconnect(QObject* sender, const QString& signal, QObject* receiver, const QString& slot);
+  bool static_QObject_disconnect(QObject* sender, const QString& signal, PyObject* callable = NULL) { return disconnect(sender, signal, callable); }
+  bool static_QObject_disconnect(QObject* sender, const QString& signal, QObject* receiver, const QString& slot) { return connect(sender, signal, receiver, slot); }
 
   const QMetaObject* metaObject( QObject* obj );
 
@@ -110,10 +111,25 @@ public Q_SLOTS:
   QByteArray static_Qt_SIGNAL(const QByteArray& s) { return QByteArray("2") + s; }
   QByteArray static_Qt_SLOT(const QByteArray& s) { return QByteArray("1") + s; }
 
+  void static_QTimer_singleShot(int msec, PyObject* callable);
+
 private:
   QObject* findChild(QObject* parent, const char* typeName, const QMetaObject* meta, const QString& name);
   int findChildren(QObject* parent, const char* typeName, const QMetaObject* meta, const QString& name, QList<QObject*>& list);
   int findChildren(QObject* parent, const char* typeName, const QMetaObject* meta, const QRegExp& regExp, QList<QObject*>& list);
+};
+
+class PythonQtSingleShotTimer : public QTimer
+{
+  Q_OBJECT
+public:
+  PythonQtSingleShotTimer(int msec, const PythonQtObjectPtr& callable);
+
+public Q_SLOTS :
+  void slotTimeout();
+
+private:
+  PythonQtObjectPtr _callable;
 };
 
 class PythonQtWrapper_QMetaObject : public QObject
