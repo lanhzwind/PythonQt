@@ -150,7 +150,6 @@ if(PythonQt_QT_VERSION MATCHES 5)
   set(QT_LIBRARIES )
   foreach(qtlib ${qt_required_components})
        include_directories(${Qt5${qtlib}_INCLUDE_DIRS})
-       message(STATUS "include dir: ${Qt5${qtlib}_INCLUDE_DIRS}")
        list(APPEND QT_LIBRARIES ${Qt5${qtlib}_LIBRARIES})
        add_definitions(${Qt5${qtlib}_DEFINITIONS})
   endforeach()
@@ -206,20 +205,22 @@ endif()
 # Sources
 
 set(sources
+    src/PythonQt.cpp
     src/PythonQtBoolResult.cpp
     src/PythonQtClassInfo.cpp
     src/PythonQtClassWrapper.cpp
     src/PythonQtConversion.cpp
-    src/PythonQt.cpp
     src/PythonQtImporter.cpp
     src/PythonQtInstanceWrapper.cpp
     src/PythonQtMethodInfo.cpp
     src/PythonQtMisc.cpp
     src/PythonQtObjectPtr.cpp
+    src/PythonQtProperty.cpp
     src/PythonQtQFileImporter.cpp
+    src/PythonQtSignal.cpp
     src/PythonQtSignalReceiver.cpp
     src/PythonQtSlot.cpp
-    src/PythonQtSignal.cpp
+    src/PythonQtSlotDecorator.cpp
     src/PythonQtStdDecorators.cpp
     src/PythonQtStdIn.cpp
     src/PythonQtStdOut.cpp
@@ -235,37 +236,41 @@ set(sources
 # List headers.  This is list is used for the install command.
 
 set(headers
+    src/PythonQt.h
     src/PythonQtBoolResult.h
     src/PythonQtClassInfo.h
     src/PythonQtClassWrapper.h
     src/PythonQtConversion.h
     src/PythonQtCppWrapperFactory.h
     src/PythonQtDoc.h
-    src/PythonQt.h
     src/PythonQtImporter.h
     src/PythonQtImportFileInterface.h
     src/PythonQtInstanceWrapper.h
     src/PythonQtMethodInfo.h
     src/PythonQtMisc.h
     src/PythonQtObjectPtr.h
+    src/PythonQtProperty.h
+    src/PythonQtPythonInclude.h
     src/PythonQtQFileImporter.h
+    src/PythonQtSignal.h
     src/PythonQtSignalReceiver.h
     src/PythonQtSlot.h
-    src/PythonQtSignal.h
+    src/PythonQtSlotDecorator.h
     src/PythonQtStdDecorators.h
     src/PythonQtStdIn.h
     src/PythonQtStdOut.h
     src/PythonQtSystem.h
-    src/PythonQtVariants.h
-    src/PythonQtPythonInclude.h
     src/PythonQtUtils.h
+    src/PythonQtVariants.h
     src/gui/PythonQtScriptingConsole.h
 )
+
+set(PythonQt_INCLUDE_DIRS ${PythonQt_SOURCE_DIR}/src ${PythonQt_SOURCE_DIR}/src/gui)
 
 if(PythonQt_QT_VERSION MATCHES 5)
   set(sources ${sources} extensions/PythonQt_QtAll/PythonQt_QtAll.cpp)
   set(headers ${headers} extensions/PythonQt_QtAll/PythonQt_QtAll.h)
-  set(PythonQt_INCLUDE_DIRS ${PythonQt_SOURCE_DIR}/src ${PythonQt_SOURCE_DIR}/src/gui ${PythonQt_SOURCE_DIR}/extensions/PythonQt_QtAll)
+  set(PythonQt_INCLUDE_DIRS ${PythonQt_INCLUDE_DIRS} ${PythonQt_SOURCE_DIR}/extensions/PythonQt_QtAll)
 endif()
 #-----------------------------------------------------------------------------
 # Headers that should run through moc
@@ -310,8 +315,6 @@ foreach(pythonqtlib ${pythonqtlibs})
   endif()
 endforeach()
 
-
-
 #-----------------------------------------------------------------------------
 # UI files
 set(ui_sources )
@@ -331,6 +334,8 @@ pythonqt_add_resources(gen_qrc_sources ${qrc_sources})
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
+  ${CMAKE_CURRENT_SOURCE_DIR}/extensions/PythonQt_QtAll
   )
 
 add_library(PythonQt SHARED
@@ -407,7 +412,6 @@ if(BUILD_TESTING)
 
   add_executable(PythonQtCppTests ${test_sources})
   target_link_libraries(PythonQtCppTests PythonQt)
-  #target_link_libraries(PythonQtCppTests PythonQt ${Qt5Test_LIBRARIES})
 
   add_test(
     NAME tests_PythonQtTestMain
