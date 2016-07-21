@@ -37,6 +37,6 @@ include ($$PYTHONQT_GENERATED_PATH/com_trolltech_qt_quick/com_trolltech_qt_quick
 
 PythonQtWebKit {
   QT += webkit webkitwidgets
-  DEFINES += PYTHONQT_WITH_WEBKIT
+  DEFINES += PYTHONQT_WRAP_QTWEBKIT
   include ($$PYTHONQT_GENERATED_PATH/com_trolltech_qt_webkit/com_trolltech_qt_webkit.pri)
 }

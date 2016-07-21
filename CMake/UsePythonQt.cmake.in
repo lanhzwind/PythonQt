@@ -1,0 +1,10 @@
+if(NOT PythonQt_USE_FILE_INCLUDED)
+  set(PythonQt_USE_FILE_INCLUDED 1)
+
+  # Add include directories needed to use PythonQt.
+  include_directories(${PythonQt_INCLUDE_DIRS})
+
+  # Add link directories needed to use PythonQt.
+  link_directories(${PythonQt_LIBRARY_DIRS})
+
+endif()

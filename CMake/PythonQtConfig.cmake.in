@@ -1,0 +1,14 @@
+
+# Import PythonQt targets
+#if(NOT PythonQt_EXPORTS_INCLUDED)
+#  include("@PythonQt_BINARY_DIR@/PythonQtExports.cmake")
+#  set(PythonQt_EXPORTS_INCLUDED 1)
+#endif()
+
+set(PythonQt_LIBRARIES "PythonQt")
+
+set(PythonQt_INCLUDE_DIRS "@PythonQt_INCLUDE_DIRS_CONFIG@")
+set(PythonQt_LIBRARY_DIRS "@PythonQt_LIBRARY_DIRS_CONFIG@")
+
+# The location of the UsePythonQt.cmake file.
+set(PythonQt_USE_FILE "@PythonQt_USE_FILE_CONFIG@")
