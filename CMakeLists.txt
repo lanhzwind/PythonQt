@@ -154,14 +154,8 @@ if(PythonQt_QT_VERSION MATCHES 5)
        add_definitions(${Qt5${qtlib}_DEFINITIONS})
   endforeach()
 
-  #For PythonQt3.1, it uses a private header file form QtCore Module 
-  file(GLOB_RECURSE Qt5_Core_Private_File "${_Qt5_DIR}/include/QtCore/*qmetaobjectbuilder_p.h" )
-  get_filename_component(Qt5_Core_Private_DIR ${Qt5_Core_Private_File} DIRECTORY )
-  get_filename_component(Qt5_Core_Private_Parent_DIR "${Qt5_Core_Private_DIR}/../" ABSOLUTE)
-  #Or use verison number to locate, but it may be not robust.
-  #set(Qt5_Core_Private_Parent_DIR "${_Qt5_DIR}/include/QtCore/${Qt5Core_VERSION_MAJOR}.${Qt5Core_VERSION_MINOR}.${Qt5Core_VERSION_PATCH}/QtCore")
-
-  include_directories(${Qt5_Core_Private_Parent_DIR})
+  #For PythonQt3.1, it uses a private header file from QtCore Module 
+  include_directories(${Qt5Core_PRIVATE_INCLUDE_DIRS})
 
   set(QT_VERSION_MAJOR ${Qt5Core_VERSION_MAJOR})
   set(QT_VERSION_MINOR ${Qt5Core_VERSION_MINOR})
