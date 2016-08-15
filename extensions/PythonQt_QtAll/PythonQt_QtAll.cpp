@@ -32,8 +32,6 @@
 
 #include "PythonQt_QtAll.h"
 
-#include "PythonQt.h"
-
 #ifdef PYTHONQT_WRAP_QTGUI
 void PythonQt_init_QtGui(PyObject*);
 #endif
@@ -84,7 +82,7 @@ void PythonQt_init_QtWebKit(PyObject*);
 
 namespace PythonQt_QtAll
 {
-  PYTHONQT_QTALL_EXPORT void init() {
+  PYTHONQT_EXPORT void init() {
 
 #ifdef PYTHONQT_WRAP_QTCORE
     PythonQt_init_QtCore(0);
